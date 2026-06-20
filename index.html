@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Solutions | Tu Aliado Tecnológico</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js for Background Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        tech: ['Rajdhani', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#0a0a0f',
+                        cyanTech: '#00f0ff',
+                        orangeTech: '#ff5e00',
+                        grayDark: '#111116',
+                        cardBg: 'rgba(17, 17, 22, 0.7)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0a0f;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Hero 3D Background Canvas */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* Glow Effects */
+        .glow-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+        
+        .glow-text-orange {
+            text-shadow: 0 0 10px rgba(255, 94, 0, 0.7), 0 0 20px rgba(255, 94, 0, 0.5);
+        }
+
+        .glow-border {
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glow-border:hover {
+            border-color: rgba(0, 240, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .glow-border-orange:hover {
+            border-color: rgba(255, 94, 0, 0.8);
+            box-shadow: 0 0 15px rgba(255, 94, 0, 0.3);
+        }
+
+        /* Glassmorphism */
+        .glass-nav {
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00f0ff; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff5e00; 
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <nav class="glass-nav fixed w-full z-50 top-0 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <!-- Simulated CSS Logo -->
+                    <div class="relative w-10 h-10 flex items-center justify-center rounded-full border-2 border-cyanTech shadow-[0_0_10px_#00f0ff]">
+                        <span class="font-tech text-xl font-bold text-white tracking-tighter">TS</span>
+                    </div>
+                    <div>
+                        <span class="font-tech font-bold text-2xl tracking-wide text-white">Tech <span class="text-cyanTech glow-text-cyan">Solutions</span></span>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#inicio" class="text-gray-300 hover:text-cyanTech transition-colors text-sm font-semibold tracking-wide">Inicio</a>
+                    <a href="#servicios" class="text-gray-300 hover:text-cyanTech transition-colors text-sm font-semibold tracking-wide">Servicios</a>
+                    <a href="#nosotros" class="text-gray-300 hover:text-cyanTech transition-colors text-sm font-semibold tracking-wide">Nosotros</a>
+                    <a href="#contacto" class="text-gray-300 hover:text-cyanTech transition-colors text-sm font-semibold tracking-wide">Contacto</a>
+                    <a href="https://wa.me/593996548855?text=Hola,%20vengo%20de%20su%20página%20web%20y%20deseo%20cotizar%20un%20proyecto." target="_blank" class="bg-transparent border border-cyanTech text-cyanTech hover:bg-cyanTech hover:text-dark px-5 py-2 rounded-full font-bold transition-all duration-300 shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+                        <i class="fab fa-whatsapp mr-2"></i>Cotizar Ahora
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-grayDark border-b border-gray-800">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-cyanTech hover:bg-gray-800 rounded-md">Inicio</a>
+                <a href="#servicios" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-cyanTech hover:bg-gray-800 rounded-md">Servicios</a>
+                <a href="#nosotros" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-cyanTech hover:bg-gray-800 rounded-md">Nosotros</a>
+                <a href="#contacto" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-cyanTech hover:bg-gray-800 rounded-md">Contacto</a>
+                <a href="https://wa.me/593996548855" target="_blank" class="block px-3 py-2 text-base font-medium text-cyanTech hover:bg-gray-800 rounded-md">
+                    <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="inicio" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        <!-- 3D Canvas Container -->
+        <canvas id="bg-canvas"></canvas>
+        
+        <!-- Overlay Gradient for better text readability -->
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark/50 to-dark"></div>
+
+        <div class="relative z-10 text-center px-4 max-w-5xl mx-auto">
+            <div class="inline-block mb-4 px-4 py-1 rounded-full border border-orangeTech/30 bg-orangeTech/10 backdrop-blur-sm reveal">
+                <span class="text-orangeTech font-semibold text-sm tracking-widest uppercase">Innovación digital, resultados reales</span>
+            </div>
+            
+            <h1 class="font-tech text-5xl md:text-7xl font-bold mb-6 leading-tight reveal" style="transition-delay: 100ms;">
+                Transformamos tu negocio con <br class="hidden md:block">
+                <span class="text-cyanTech glow-text-cyan">Tecnología Inteligente</span>
+            </h1>
+            
+            <p class="text-lg md:text-xl text-gray-400 mb-10 max-w-3xl mx-auto reveal" style="transition-delay: 200ms;">
+                Desde Quito para todo el Ecuador. Somos la agencia tecnológica integral experta en páginas web, inteligencia artificial, marketing digital y soporte técnico premium.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 reveal" style="transition-delay: 300ms;">
+                <a href="#servicios" class="w-full sm:w-auto px-8 py-4 bg-cyanTech text-dark font-bold rounded-md hover:bg-white transition-colors duration-300 text-center shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+                    Explorar Servicios
+                </a>
+                <a href="https://wa.me/593996548855?text=Hola,%20me%20interesa%20transformar%20mi%20negocio." target="_blank" class="w-full sm:w-auto px-8 py-4 bg-transparent border border-gray-600 text-white font-bold rounded-md hover:border-orangeTech hover:text-orangeTech transition-all duration-300 text-center flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp text-xl"></i> Hablar con un Asesor
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="#servicios" class="text-gray-500 hover:text-cyanTech">
+                <i class="fas fa-chevron-down text-2xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <section id="servicios" class="py-24 bg-dark relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-tech text-3xl md:text-5xl font-bold text-white mb-4">Nuestros <span class="text-cyanTech glow-text-cyan">Servicios</span></h2>
+                <div class="h-1 w-20 bg-cyanTech mx-auto rounded-full mb-4 shadow-[0_0_10px_#00f0ff]"></div>
+                <p class="text-gray-400 max-w-2xl mx-auto">Soluciones integrales diseñadas para automatizar, escalar y proteger tu ecosistema digital.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <!-- Service 1: Web -->
+                <div class="bg-cardBg p-8 rounded-xl glow-border reveal">
+                    <div class="w-14 h-14 bg-cyanTech/10 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-laptop-code text-3xl text-cyanTech"></i>
+                    </div>
+                    <h3 class="font-tech text-2xl font-bold text-white mb-3">Desarrollo Web & Apps</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        Páginas corporativas, tiendas online y aplicaciones a medida con arquitecturas modernas. Interfaces ultrarrápidas y diseño responsive.
+                    </p>
+                    <a href="https://wa.me/593996548855" class="text-cyanTech text-sm font-bold hover:underline flex items-center gap-2">
+                        Cotizar Web <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Service 2: AI -->
+                <div class="bg-cardBg p-8 rounded-xl glow-border glow-border-orange reveal" style="transition-delay: 100ms;">
+                    <div class="w-14 h-14 bg-orangeTech/10 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-robot text-3xl text-orangeTech"></i>
+                    </div>
+                    <h3 class="font-tech text-2xl font-bold text-white mb-3">Agentes Virtuales IA</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        Automatiza tu atención al cliente 24/7. Chatbots inteligentes conectados a WhatsApp Business para escalar tus ventas sin esfuerzo.
+                    </p>
+                    <a href="https://wa.me/593996548855" class="text-orangeTech text-sm font-bold hover:underline flex items-center gap-2">
+                        Integrar IA <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Service 3: Marketing -->
+                <div class="bg-cardBg p-8 rounded-xl glow-border reveal" style="transition-delay: 200ms;">
+                    <div class="w-14 h-14 bg-cyanTech/10 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-bullhorn text-3xl text-cyanTech"></i>
+                    </div>
+                    <h3 class="font-tech text-2xl font-bold text-white mb-3">Marketing Digital</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        Gestión de redes sociales, diseño de logos premium, y campañas publicitarias estratégicas que atraen clientes reales a tu negocio.
+                    </p>
+                    <a href="https://wa.me/593996548855" class="text-cyanTech text-sm font-bold hover:underline flex items-center gap-2">
+                        Impulsar Marca <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Service 4: Support -->
+                <div class="bg-cardBg p-8 rounded-xl glow-border glow-border-orange reveal" style="transition-delay: 300ms;">
+                    <div class="w-14 h-14 bg-orangeTech/10 rounded-lg flex items-center justify-center mb-6">
+                        <i class="fas fa-microchip text-3xl text-orangeTech"></i>
+                    </div>
+                    <h3 class="font-tech text-2xl font-bold text-white mb-3">Soporte Técnico PC</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        Mantenimiento preventivo y correctivo de hardware/software para computadoras y laptops. Operatividad garantizada.
+                    </p>
+                    <a href="https://wa.me/593996548855" class="text-orangeTech text-sm font-bold hover:underline flex items-center gap-2">
+                        Solicitar Soporte <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="nosotros" class="py-24 bg-grayDark relative border-y border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <div class="reveal">
+                    <div class="inline-block mb-4 px-4 py-1 rounded-full border border-cyanTech/30 bg-cyanTech/10">
+                        <span class="text-cyanTech font-semibold text-sm tracking-widest uppercase">CEO & Fundador</span>
+                    </div>
+                    <h2 class="font-tech text-3xl md:text-5xl font-bold text-white mb-6">Gustavo <span class="text-orangeTech">Berrones</span></h2>
+                    <p class="text-gray-300 text-lg mb-6 leading-relaxed">
+                        "Mi objetivo es democratizar el acceso a la tecnología de alto nivel. En <strong>Tech Solutions</strong> no solo arreglamos computadoras o hacemos páginas; construimos el motor digital que impulsa el crecimiento de tu empresa."
+                    </p>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 bg-cyanTech/20 p-2 rounded text-cyanTech"><i class="fas fa-check"></i></div>
+                            <div>
+                                <h4 class="font-bold text-white">Misión</h4>
+                                <p class="text-sm text-gray-400">Proveer soluciones tecnológicas integrales que impulsen la eficiencia y crecimiento empresarial en Ecuador.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 bg-orangeTech/20 p-2 rounded text-orangeTech"><i class="fas fa-eye"></i></div>
+                            <div>
+                                <h4 class="font-bold text-white">Visión</h4>
+                                <p class="text-sm text-gray-400">Ser la agencia referente a nivel nacional por nuestra innovación en IA y calidad visual corporativa.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <!-- Abstract Tech Visual instead of a photo to match the Cyber Vibe -->
+                <div class="relative reveal h-96 rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900 to-black overflow-hidden flex items-center justify-center shadow-[0_0_30px_rgba(0,240,255,0.1)]">
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0iIzExMTExNiI+PC9yZWN0Pgo8cGF0aCBkPSJNNTQgMzBoLTV2MjRINDUwVjMwaC01di01aDVaIiBmaWxsPSIjMjIyMjI4IiBmaWxsLW9wYWNpdHk9IjAuNSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-20"></div>
+                    
+                    <div class="z-10 text-center">
+                        <div class="w-32 h-32 mx-auto rounded-full border-4 border-cyanTech/50 flex items-center justify-center relative animate-[spin_10s_linear_infinite]">
+                            <div class="absolute w-28 h-28 border-2 border-dashed border-orangeTech/50 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+                            <i class="fas fa-microchip text-5xl text-cyanTech animate-pulse"></i>
+                        </div>
+                        <h3 class="font-tech text-2xl font-bold mt-6 text-white tracking-widest">TECH<span class="text-cyanTech">CORE</span></h3>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="contacto" class="py-24 bg-dark relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-tech text-3xl md:text-5xl font-bold text-white mb-4">Inicia tu <span class="text-orangeTech glow-text-orange">Transformación</span></h2>
+                <div class="h-1 w-20 bg-orangeTech mx-auto rounded-full mb-4 shadow-[0_0_10px_#ff5e00]"></div>
+                <p class="text-gray-400 max-w-2xl mx-auto">Visítanos o escríbenos por WhatsApp. Estamos listos para elevar tu negocio.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Contact Info Cards -->
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-cardBg p-6 rounded-xl border border-gray-800 flex items-center gap-4 reveal">
+                        <div class="w-12 h-12 bg-[#25D366]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fab fa-whatsapp text-2xl text-[#25D366]"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 text-sm">Ventas y Asesoría</p>
+                            <a href="https://wa.me/593996548855" target="_blank" class="text-white font-bold text-lg hover:text-[#25D366] transition">0996548855</a>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-cardBg p-6 rounded-xl border border-gray-800 flex items-center gap-4 reveal" style="transition-delay: 100ms;">
+                        <div class="w-12 h-12 bg-cyanTech/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-phone-alt text-xl text-cyanTech"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 text-sm">Soporte Técnico</p>
+                            <a href="tel:0984325613" class="text-white font-bold text-lg hover:text-cyanTech transition">0984325613</a>
+                        </div>
+                    </div>
+
+                    <div class="bg-cardBg p-6 rounded-xl border border-gray-800 flex items-center gap-4 reveal" style="transition-delay: 200ms;">
+                        <div class="w-12 h-12 bg-orangeTech/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-map-marker-alt text-xl text-orangeTech"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 text-sm">Ubicación</p>
+                            <p class="text-white font-bold">Quito, Ecuador</p>
+                            <a href="https://maps.app.goo.gl/dzjjyGw1UfmvnemC8" target="_blank" class="text-orangeTech text-sm hover:underline">Ver en Google Maps</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Google Maps Embed -->
+                <div class="lg:col-span-2 bg-cardBg p-2 rounded-xl border border-gray-800 reveal shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+                    <div class="w-full h-80 rounded-lg overflow-hidden relative">
+                        <!-- Dark customized Google Maps iframe for Quito -->
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127641.18956961448!2d-78.5833441!3d-0.2201641!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a4002427c9f%3A0x44b991e158ef5572!2sQuito%2C%20Ecuador!5e0!3m2!1sen!2sus!4v1716300000000!5m2!1sen!2sus" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0; filter: invert(90%) hue-rotate(180deg) brightness(80%) contrast(120%);" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                        <!-- Overlay button to redirect to exact pin -->
+                        <div class="absolute inset-0 bg-dark/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                             <a href="https://maps.app.goo.gl/dzjjyGw1UfmvnemC8" target="_blank" class="bg-orangeTech text-white px-6 py-3 rounded-full font-bold shadow-[0_0_15px_#ff5e00] hover:scale-105 transition-transform">
+                                <i class="fas fa-location-arrow mr-2"></i> Abrir en Maps
+                             </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black border-t border-gray-900 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 flex items-center justify-center rounded-full border border-cyanTech">
+                        <span class="font-tech text-sm font-bold text-white">TS</span>
+                    </div>
+                    <span class="font-tech font-bold text-xl text-white">Tech <span class="text-cyanTech">Solutions</span></span>
+                </div>
+
+                <p class="text-gray-500 text-sm text-center">
+                    &copy; <span id="year"></span> Tech Solutions - Gustavo Berrones. Todos los derechos reservados.
+                </p>
+
+                <div class="flex space-x-4">
+                    <a href="https://wa.me/593996548855" target="_blank" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:text-cyanTech hover:bg-gray-800 transition">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:text-cyanTech hover:bg-gray-800 transition">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:text-cyanTech hover:bg-gray-800 transition">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Scroll Animations (Intersection Observer)
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    return;
+                } else {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, revealOptions);
+
+        revealElements.forEach(el => {
+            revealOnScroll.observe(el);
+        });
+
+        // -------------------------------------------------------------
+        // Three.js Cyber-Futuristic Particle Network Background
+        // -------------------------------------------------------------
+        const canvas = document.getElementById('bg-canvas');
+        
+        // Setup scene
+        const scene = new THREE.Scene();
+        // Fog to fade out particles in distance
+        scene.fog = new THREE.FogExp2(0x0a0a0f, 0.0015);
+
+        // Setup camera
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 100;
+
+        // Setup renderer
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // optimize for high DPI
+
+        // Create Particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 300; // number of dots
+        
+        const posArray = new Float32Array(particlesCount * 3);
+        const colorsArray = new Float32Array(particlesCount * 3);
+
+        const colorCyan = new THREE.Color('#00f0ff');
+        const colorOrange = new THREE.Color('#ff5e00');
+
+        for(let i = 0; i < particlesCount * 3; i+=3) {
+            // Position
+            posArray[i] = (Math.random() - 0.5) * 300;     // x
+            posArray[i+1] = (Math.random() - 0.5) * 300;   // y
+            posArray[i+2] = (Math.random() - 0.5) * 300;   // z
+
+            // Randomly assign Cyan or Orange
+            const mixedColor = Math.random() > 0.8 ? colorOrange : colorCyan;
+            colorsArray[i] = mixedColor.r;
+            colorsArray[i+1] = mixedColor.g;
+            colorsArray[i+2] = mixedColor.b;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+
+        // Material
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 1.5,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        // Mesh
+        const particleMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particleMesh);
+
+        // Lines connecting particles
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0x00f0ff,
+            transparent: true,
+            opacity: 0.1,
+            blending: THREE.AdditiveBlending
+        });
+
+        // Optimization: Only connect a subset to save performance
+        const lineGeometry = new THREE.BufferGeometry();
+        const maxConnections = 150;
+        const positions = new Float32Array(maxConnections * 6);
+        lineGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const linesMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
+        scene.add(linesMesh);
+
+        // Mouse Interaction
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Rotate entire particle system slowly
+            particleMesh.rotation.y = elapsedTime * 0.05;
+            particleMesh.rotation.x = elapsedTime * 0.02;
+            
+            linesMesh.rotation.y = elapsedTime * 0.05;
+            linesMesh.rotation.x = elapsedTime * 0.02;
+
+            // Ease camera movement towards mouse
+            targetX = mouseX * 0.05;
+            targetY = mouseY * 0.05;
+            
+            camera.position.x += (targetX - camera.position.x) * 0.02;
+            camera.position.y += (-targetY - camera.position.y) * 0.02;
+            camera.lookAt(scene.position);
+
+            // Update lines (Dynamic networking effect)
+            const positions = particleMesh.geometry.attributes.position.array;
+            const linePositions = linesMesh.geometry.attributes.position.array;
+            let vertexpos = 0;
+            let numConnected = 0;
+
+            for (let i = 0; i < particlesCount; i++) {
+                for (let j = i + 1; j < particlesCount; j++) {
+                    const dx = positions[i * 3] - positions[j * 3];
+                    const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
+                    const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    if (dist < 35 && numConnected < maxConnections) {
+                        linePositions[vertexpos++] = positions[i * 3];
+                        linePositions[vertexpos++] = positions[i * 3 + 1];
+                        linePositions[vertexpos++] = positions[i * 3 + 2];
+
+                        linePositions[vertexpos++] = positions[j * 3];
+                        linePositions[vertexpos++] = positions[j * 3 + 1];
+                        linePositions[vertexpos++] = positions[j * 3 + 2];
+
+                        numConnected++;
+                    }
+                }
+            }
+            
+            linesMesh.geometry.setDrawRange(0, numConnected * 2);
+            linesMesh.geometry.attributes.position.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+
+        // Start animation on load
+        window.onload = function() {
+            animate();
+        };
+
+    </script>
+</body>
+</html>
